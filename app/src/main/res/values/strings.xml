@@ -8,4 +8,8 @@
     <string name="action_settings">Settings</string>
 
     <string name="gmaps_api">AIzaSyANgvw1mmYbbRHcebNQaYuEA0_6AZJGPds</string>
+    <string name="live_times">View Live Times</string>
+    <string name="loading">Loading</string>
+    <string name="no_internet">Could not load current times, as you don\'t currently have an internet connection.</string>
+    <string name="reload">Reload</string>
 </resources>

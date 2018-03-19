@@ -1,9 +1,6 @@
 package meme.busoton;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,10 +13,15 @@ import android.widget.TabHost;
 
 import java.util.ArrayDeque;
 
+import meme.busoton.comms.data.BusStop;
+import meme.busoton.map.MapManager;
+
 public class Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     ArrayDeque<Integer> tabHistory;
+    TabManager tabManager;
+    MapManager mapManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +39,10 @@ public class Main extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        new TabManager(this);
+        tabManager = new TabManager(this);
         tabHistory = new ArrayDeque<>();
 
-        new MapManager().showMap(this);
+        mapManager = new MapManager().showMap(this);
     }
 
     @Override
@@ -114,5 +116,12 @@ public class Main extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void showBusStop(String stopID){
+        BusStop bs = mapManager.getStop(stopID);
+
+        tabHistory.add(tabManager.getCurrentTab());
+        tabManager.showBusStop(bs);
     }
 }

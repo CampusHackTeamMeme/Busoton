@@ -21,7 +21,8 @@
             <TabWidget
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
             <FrameLayout
                 android:id="@android:id/tabcontent"
@@ -42,6 +43,11 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
+                    <include
+                        layout="@layout/loading_times"
+                        layout_width="match_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
                 </LinearLayout>
 
                 <LinearLayout

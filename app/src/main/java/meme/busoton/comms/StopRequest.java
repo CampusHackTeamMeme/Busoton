@@ -1,11 +1,7 @@
 package meme.busoton.comms;
 
-import android.support.v7.app.AppCompatActivity;
-
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,14 +10,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayDeque;
 
-import meme.busoton.Main;
-import meme.busoton.MapManager;
+import meme.busoton.map.MapManager;
 import meme.busoton.comms.data.BusStop;
 import okhttp3.FormBody;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -29,9 +22,7 @@ import okhttp3.Response;
  */
 
 public class StopRequest {
-    private static final String stopRequestURL = "http://192.168.0.33:8080/api/busstops";
-
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final String stopRequestURL = "https://bus.joshp.tech/api/busstops";
 
     private LatLngBounds bounds;
     private MapManager mapManager;
@@ -59,12 +50,15 @@ public class StopRequest {
 
     public StopRequest fetch() {
         try{
-            OkHttpClient client = new OkHttpClient();
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .followRedirects(true)
+                    .build();
 
-            RequestBody body = makeForm();
+            FormBody body = makeForm();
+
             Request request = new Request.Builder()
                     .url(stopRequestURL)
-                    .method("get", body)
+                    .post(body)
                     .build();
 
             Response response = client.newCall(request).execute();
