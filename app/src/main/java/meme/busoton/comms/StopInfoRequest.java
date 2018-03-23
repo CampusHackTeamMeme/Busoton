@@ -28,10 +28,12 @@ import okhttp3.Response;
 public class StopInfoRequest {
     private static final String timetableRequestURL = "https://bus.joshp.tech/api/timetable";
 
+    private String stopName;
     private String stopID;
     private ArrayList<NextBus> nextBus;
 
-    public StopInfoRequest(String stopID){
+    public StopInfoRequest(String stopName, String stopID){
+        this.stopName = stopName;
         this.stopID = stopID;
         nextBus = new ArrayList<>();
     }
@@ -83,7 +85,7 @@ public class StopInfoRequest {
                     String operator = current.getString("operator");
                     String destination = current.getString("destination");
 
-                    NextBus nb = new NextBus(serviceName, operator, destination);
+                    NextBus nb = new NextBus(stopName, serviceName, operator, destination);
 
                     JSONArray time = current.getJSONArray("time");
 

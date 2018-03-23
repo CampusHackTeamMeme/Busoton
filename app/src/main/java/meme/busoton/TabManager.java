@@ -63,22 +63,24 @@ public class TabManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                new StopInfoRequest(bs.stopID).fetch().addNextBus(bs);
+                new StopInfoRequest(bs.name, bs.stopID).fetch().addNextBus(bs);
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if(bs.nextBus.size() == 0){
                             View v = context.getLayoutInflater().inflate(R.layout.reload_times, null);
                             ConstraintLayout parent = context.findViewById(R.id.parent);
-                            parent.removeView((View) context.findViewById(R.id.relativeLayout));
+                            parent.removeAllViews();
+
                             parent.addView(v);
                             Button reload = v.findViewById(R.id.reload);
                             reload.setOnClickListener(ev -> showBusStop(bs));
                         } else {
                             View v = context.getLayoutInflater().inflate(R.layout.live_times, null);
                             ConstraintLayout parent = context.findViewById(R.id.parent);
-                            parent.removeView((View) context.findViewById(R.id.relativeLayout));
-                            parent.removeView((View) context.findViewById(R.id.recycle));
+
+                            parent.removeAllViews();
+
                             parent.addView(v);
                             RecyclerView recycle = context.findViewById(R.id.recycle);
                             recycle.setHasFixedSize(true);
@@ -86,7 +88,7 @@ public class TabManager {
                             GridLayoutManager glm = new GridLayoutManager(context, 1);
                             recycle.setLayoutManager(glm);
 
-                            RVAdapter adapter = new RVAdapter(bs.nextBus);
+                            RVAdapter adapter = new RVAdapter(bs.nextBus, context);
                             recycle.setAdapter(adapter);
                         }
                     }
