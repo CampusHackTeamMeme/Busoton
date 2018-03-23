@@ -12,15 +12,17 @@ import java.util.TreeSet;
  */
 
 public class NextBus implements Comparable<NextBus>{
+    public String stopName;
     public String serviceName;
     public String operator;
     public String destination;
 
     public ArrayList<BusTime> times;
 
-    public NextBus(String serviceName, String operator, String destination){
+    public NextBus(String stopName, String serviceName, String operator, String destination){
         times = new ArrayList<>();
 
+        this.stopName = stopName;
         this.serviceName = serviceName;
         this.operator = operator;
         this.destination = destination;

@@ -1,15 +1,19 @@
 package meme.busoton.map;
 
+import android.Manifest;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,13 +48,12 @@ public class MapManager implements OnMapReadyCallback, GoogleMap.OnMapLoadedCall
     private HashSet<BusStop> added;
 
 
-
-    public MapManager(){
+    public MapManager() {
         stops = new HashMap<>();
         added = new HashSet<>();
     }
 
-    public BusStop getStop(String stopID){
+    public BusStop getStop(String stopID) {
         return stops.get(stopID);
     }
 
@@ -69,7 +72,34 @@ public class MapManager implements OnMapReadyCallback, GoogleMap.OnMapLoadedCall
     @Override
     public void onMapReady(GoogleMap gmap) {
         this.gmap = gmap;
-        gmap.setMyLocationEnabled(true);
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(context,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+            }
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
+
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+            // No explanation needed; request the permission
+            ActivityCompat.requestPermissions(context,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    123);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        } else {
+            gmap.setMyLocationEnabled(true);
+        }
         gmap.setOnCameraMoveListener(this);
 
         //setup clustering
@@ -85,7 +115,10 @@ public class MapManager implements OnMapReadyCallback, GoogleMap.OnMapLoadedCall
         locCriteria.setAccuracy(Criteria.NO_REQUIREMENT);
         locationManager.getBestProvider(locCriteria, false);
 
-        locationManager.requestSingleUpdate(locCriteria, new BusLocationListener(), null);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        } else {
+            locationManager.requestSingleUpdate(locCriteria, new BusLocationListener(), null);
+        }
     }
 
     @Override
@@ -114,6 +147,7 @@ public class MapManager implements OnMapReadyCallback, GoogleMap.OnMapLoadedCall
     }
 
     private int counter = 0;
+    private boolean showToast = true;
 
     @Override
     public void onCameraMove() {
@@ -121,10 +155,21 @@ public class MapManager implements OnMapReadyCallback, GoogleMap.OnMapLoadedCall
             updateStops();
             counter = 0;
         }
+
+        if(gmap.getCameraPosition().zoom <= 14){
+            added = new HashSet<>();
+            busStopManager.clearItems();
+            busStopManager.cluster();
+            if(showToast) {
+                Toast.makeText(context, "Zoom in to see bus stops", Toast.LENGTH_SHORT).show();
+                showToast = false;
+            }
+        }
     }
 
     protected void updateStops(){
         if (gmap.getCameraPosition().zoom > 14) {
+            showToast = true;
             LatLngBounds bounds = gmap.getProjection().getVisibleRegion().latLngBounds;
             new Thread(() -> new StopRequest(bounds, MapManager.this).fetch().addStops()).start();
         }

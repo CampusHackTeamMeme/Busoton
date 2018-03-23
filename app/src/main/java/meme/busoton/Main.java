@@ -1,19 +1,24 @@
 package meme.busoton;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TabHost;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 import meme.busoton.comms.data.BusStop;
+import meme.busoton.comms.data.NextBus;
 import meme.busoton.map.MapManager;
 
 public class Main extends AppCompatActivity
@@ -74,7 +79,7 @@ public class Main extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -102,7 +107,10 @@ public class Main extends AppCompatActivity
         if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
+            RVAdapter rva = new RVAdapter(new ArrayList<NextBus>(), this);
 
+            NextBus nb = new NextBus("testStop", "U1A", "Unilink", "Southampton City Centre");
+            rva.setNotification( nb, 21, 43, "20:44");
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -121,7 +129,29 @@ public class Main extends AppCompatActivity
     public void showBusStop(String stopID){
         BusStop bs = mapManager.getStop(stopID);
 
+        this.setTitle(bs.name);
+
         tabHistory.add(tabManager.getCurrentTab());
         tabManager.showBusStop(bs);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 123: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent i = getBaseContext().getPackageManager()
+                            .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                } else {
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
     }
 }
