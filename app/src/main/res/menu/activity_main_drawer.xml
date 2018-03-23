@@ -5,8 +5,13 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/search"
+            android:actionViewClass="android.widget.SearchView"
+            android:icon="@drawable/ic_search_black_24dp"
+            android:title="Search" />
+        <item
             android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@android:drawable/star_big_on"
             android:title="Import" />
         <item
             android:id="@+id/nav_gallery"
